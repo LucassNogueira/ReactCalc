@@ -23,7 +23,57 @@ function reducer(state, { type, payload }) {
         ...state,
         currentOperand: `${state.currentOperand || ""}${payload.digit}`,
       };
+    case ACTIONS.CLEAR:
+      return {};
+    case ACTIONS.CHOOSE_OPERATIN:
+      if (state.currentOperand == null && state.previousOperand == null) {
+        return state;
+      }
+
+      if (state.currentOperand == null) {
+        return {
+          ...state,
+          operation: payload.operation,
+        };
+      }
+      if (state.previousOperand == null) {
+        return {
+          ...state,
+          operation: payload.operation,
+          previousOperand: state.currentOperand,
+          currentOperand: null,
+        };
+      }
+      return {
+        ...state,
+        previousOperand: evaluate(state),
+        operation: payload.operation,
+        currentOperand: null,
+      };
   }
+}
+
+function evaluate({ currentOperand, previousOperand, operation }) {
+  const prev = parseFloat(previousOperand);
+  const current = parseFloat(currentOperand);
+  if (isNaN(prev) || isNaN(current)) return "";
+  let compuation = "";
+  switch (operation) {
+    case "+":
+      compuation = prev + current;
+      break;
+    case "-":
+      compuation = prev - current;
+      break;
+    case "*":
+      compuation = prev * current;
+      break;
+    case "÷":
+      compuation = prev / current;
+      break;
+  }
+
+  return compuation.toString();
 }
 
 function App() {
